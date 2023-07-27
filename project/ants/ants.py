@@ -107,6 +107,7 @@ class Ant(Insect):
     implemented = False  # Only implemented Ant classes should be instantiated
     food_cost = 0
     is_not_enforced = True
+    blocks_path = True
 
     # ADD CLASS ATTRIBUTES HERE
 
@@ -128,7 +129,14 @@ class Ant(Insect):
             place.ant = self
         else:
             # BEGIN Problem Optional 2
-            assert place.ant is None, 'Two ants in {0}'.format(place)
+            if place.ant.can_contain(self):
+                place.ant.contain_ant(self)
+            elif self.can_contain(place.ant):
+                protected_ant = place.ant
+                place.ant = self
+                place.ant.contain_ant(protected_ant)
+            else:
+                assert place.ant is None, 'Two ants in {0}'.format(place)
             # END Problem Optional 2
         Insect.add_to(self, place)
 
@@ -370,6 +378,8 @@ class ScubaThrower(ThrowerAnt):
     is_watersafe = True
     food_cost = 6
     implemented = True
+
+
 # END Problem 9
 
 # BEGIN Problem EC
@@ -383,6 +393,7 @@ class QueenAnt(ScubaThrower):  # You should change this line
     # BEGIN Problem EC
     implemented = True  # Change to True to view in the GUI
     queen_id = 0
+
     # END Problem EC
 
     def __init__(self, armor=1):
@@ -413,7 +424,6 @@ class QueenAnt(ScubaThrower):  # You should change this line
                     behind_ant.is_not_enforced = False
                 search_place = search_place.exit
 
-
         # END Problem EC
 
     def reduce_armor(self, amount):
@@ -432,6 +442,7 @@ class QueenAnt(ScubaThrower):  # You should change this line
             pass
         else:
             Ant.remove_from(self, place)
+
 
 class AntRemover(Ant):
     """Allows the player to remove ants from the board in the GUI."""
@@ -465,7 +476,10 @@ class Bee(Insect):
         """Return True if this Bee cannot advance to the next Place."""
         # Special handling for NinjaAnt
         # BEGIN Problem Optional
-        return self.place.ant is not None
+
+        current_place_ant = self.place.ant
+        return current_place_ant and current_place_ant.blocks_path
+
         # END Problem Optional
 
     def action(self, gamestate):
@@ -505,15 +519,19 @@ class NinjaAnt(Ant):
     name = 'Ninja'
     damage = 1
     food_cost = 5
+    blocks_path = False
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem Optional 1
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem Optional 1
 
     def action(self, gamestate):
         # BEGIN Problem Optional 1
         "*** YOUR CODE HERE ***"
+        current_bees = self.place.bees[:]
+        for every_bee in current_bees:
+            every_bee.reduce_armor(self.damage)
         # END Problem Optional 1
 
 
@@ -525,11 +543,13 @@ class ContainerAnt(Ant):
     def can_contain(self, other):
         # BEGIN Problem Optional 2
         "*** YOUR CODE HERE ***"
+        return self.contained_ant is None and not isinstance(other, ContainerAnt)
         # END Problem Optional 2
 
     def contain_ant(self, ant):
         # BEGIN Problem Optional 2
         "*** YOUR CODE HERE ***"
+        self.contained_ant = ant
         # END Problem Optional 2
 
     def remove_ant(self, ant):
@@ -550,6 +570,8 @@ class ContainerAnt(Ant):
     def action(self, gamestate):
         # BEGIN Optional 2
         "*** YOUR CODE HERE ***"
+        if self.contained_ant is not None:
+            self.contained_ant.action(gamestate)
         # END Optional 2
 
 
@@ -560,7 +582,11 @@ class BodyguardAnt(ContainerAnt):
     food_cost = 4
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Optional 2
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
+
+    def __init__(self, armor=2):
+        ContainerAnt.__init__(self, armor)
+
     # END Optional 2
 
 
@@ -571,8 +597,9 @@ class TankAnt(ContainerAnt):
     damage = 1
     food_cost = 6
     # OVERRIDE CLASS ATTRIBUTES HERE
+
     # BEGIN Problem Optional 3
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem Optional 3
 
@@ -582,6 +609,10 @@ class TankAnt(ContainerAnt):
     def action(self, gamestate):
         # BEGIN Problem Optional 3
         "*** YOUR CODE HERE ***"
+        ContainerAnt.action(self, gamestate)
+        current_bees = self.place.bees[:]
+        for every_bee in current_bees:
+            every_bee.reduce_armor(self.damage)
         # END Problem Optional 3
 
 
