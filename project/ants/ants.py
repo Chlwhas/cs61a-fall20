@@ -461,6 +461,11 @@ class Bee(Insect):
     damage = 1
     is_watersafe = True
 
+    def __init__(self, armor):
+        Insect.__init__(self, armor)
+        self.direction = 1
+        self.statuses = []
+
     # OVERRIDE CLASS ATTRIBUTES HERE
 
     def sting(self, ant):
@@ -492,11 +497,16 @@ class Bee(Insect):
         # Extra credit: Special handling for bee direction
         # BEGIN EC
         "*** YOUR CODE HERE ***"
-        # END EC
         if self.blocked():
             self.sting(self.place.ant)
-        elif self.armor > 0 and destination is not None:
-            self.move_to(destination)
+        elif self.direction == 1:
+            if self.armor > 0 and destination is not None:
+                self.move_to(destination)
+        elif self.direction == -1:
+            back_place = self.place.entrance
+            if self.armor > 0 and back_place is not None and not isinstance(back_place, Hive):
+                self.move_to(self.place.entrance)
+        # END EC
 
     def add_to(self, place):
         place.bees.append(self)
@@ -627,6 +637,11 @@ def make_slow(action, bee):
     """
     # BEGIN Problem Optional 4
     "*** YOUR CODE HERE ***"
+    def new_action(gamestate):
+        if gamestate.time % 2 == 0:
+            action(gamestate)
+
+    return new_action
     # END Problem Optional 4
 
 
@@ -637,6 +652,11 @@ def make_scare(action, bee):
     """
     # BEGIN Problem Optional 4
     "*** YOUR CODE HERE ***"
+    def new_action(gamestate):
+        bee.direction = -1
+        action(gamestate)
+
+    return new_action
     # END Problem Optional 4
 
 
@@ -644,6 +664,31 @@ def apply_status(status, bee, length):
     """Apply a status to a BEE that lasts for LENGTH turns."""
     # BEGIN Problem Optional 4
     "*** YOUR CODE HERE ***"
+
+    if not hasattr(bee, "original_action"):
+        bee.original_action = bee.action
+
+    new_action = status(bee.original_action, bee)
+    if not hasattr(bee, "statuses"):
+        bee.statuses = []
+    bee.statuses.append((new_action, length))
+
+    def modified_action(gamestate):
+        for action, length in list(bee.statuses):
+            if length > 0:
+                action(gamestate)
+                index = bee.statuses.index((action, length))
+                bee.statuses[index] = (action, length - 1)
+            else:
+                bee.statuses.remove((action, length))
+        if bee.statuses:
+            bee.statuses[-1][0](gamestate)
+        else:
+            bee.direction = 1
+            bee.original_action(gamestate)
+
+    bee.action = modified_action
+
     # END Problem Optional 4
 
 
@@ -653,8 +698,7 @@ class SlowThrower(ThrowerAnt):
     name = 'Slow'
     food_cost = 4
     # BEGIN Problem Optional 4
-    implemented = False  # Change to True to view in the GUI
-
+    implemented = True  # Change to True to view in the GUI
     # END Problem Optional 4
 
     def throw_at(self, target):
@@ -668,13 +712,14 @@ class ScaryThrower(ThrowerAnt):
     name = 'Scary'
     food_cost = 6
     # BEGIN Problem Optional 4
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem Optional 4
 
     def throw_at(self, target):
         # BEGIN Problem Optional 4
         "*** YOUR CODE HERE ***"
+        apply_status(make_scare, target, 2)
         # END Problem Optional 4
 
 

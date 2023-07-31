@@ -157,20 +157,20 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
-    def num_dights(n):
+    def num_digits(n):
         if n // 10 == 0:
             return 1
         else:
-            return num_dights(n // 10) + 1
+            return num_digits(n // 10) + 1
 
-    num = num_dights(n)
+    num = num_digits(n)
 
     if n // 10 == 0:
-        return n
+        return Link(n)
     else:
         first = n // (10 ** (num - 1))
         remainder = n % (10 ** (num - 1))
-        return Link(store_digits(first), store_digits(remainder))
+        return Link(first, store_digits(remainder))
 
 def is_bst(t):
     """Returns True if the Tree t has the structure of a valid BST.
@@ -198,6 +198,35 @@ def is_bst(t):
     False
     """
     "*** YOUR CODE HERE ***"
+    def bst_min(t):
+        if t.is_leaf():
+            return t.label
+        else:
+            value = min([bst_min(branch) for branch in t.branches])
+            return min(t.label, value)
+
+    def bst_max(t):
+        if t.is_leaf():
+            return t.label
+        else:
+            value = max([bst_max(branch) for branch in t.branches])
+            return max(t.label, value)
+
+    if len(t.branches) > 2:
+        return False
+    elif t.is_leaf():
+        return True
+    elif len(t.branches) == 1:
+        sub_tree = t.branches[0]
+        return bst_max(sub_tree) <= t.label or bst_min(sub_tree) > t.label
+    else:
+        left_tree, right_tree = t.branches[0], t.branches[1]
+        if bst_max(left_tree) > t.label or bst_min(right_tree) < t.label:
+            return False
+        else:
+            return all([is_bst(branch) for branch in t.branches])
+
+
 
 
 def preorder(t):
