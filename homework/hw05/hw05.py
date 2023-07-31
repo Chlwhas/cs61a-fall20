@@ -37,6 +37,44 @@ class VendingMachine:
     """
     "*** YOUR CODE HERE ***"
 
+    def __init__(self, prod_name, unit_price, balance=0, stock=0):
+        self.prod_name = prod_name
+        self.unit_price = unit_price
+        self.balance = balance
+        self.stock = stock
+
+    def vend(self):
+        if self.stock == 0 and self.balance > 0:
+            s = f'Inventory empty. Restocking required. Here is your ${self.balance}.'
+            self.balance = 0
+            return s
+
+        if self.stock == 0:
+            return 'Inventory empty. Restocking required.'
+
+        change = self.balance - self.unit_price
+        if change < 0:
+            return f'You must add ${change * -1} more funds.'
+        elif change > 0:
+            self.balance = 0
+            self.stock -= 1
+            return f'Here is your {self.prod_name} and ${change} change.'
+        else:
+            self.balance = 0
+            self.stock -= 1
+            return f'Here is your {self.prod_name}.'
+
+    def add_funds(self, amount):
+        if self.stock == 0:
+            return f'Inventory empty. Restocking required. Here is your ${amount}.'
+        else:
+            self.balance += amount
+            return f'Current balance: ${self.balance}'
+
+    def restock(self, amount):
+        self.stock += amount
+        return f'Current {self.prod_name} stock: {self.stock}'
+
 
 class Mint:
     """A mint creates coins by stamping on years.
@@ -74,9 +112,13 @@ class Mint:
 
     def create(self, kind):
         "*** YOUR CODE HERE ***"
+        return kind(self.year)
 
     def update(self):
         "*** YOUR CODE HERE ***"
+        self.year = Mint.current_year
+
+
 
 class Coin:
     def __init__(self, year):
@@ -84,9 +126,16 @@ class Coin:
 
     def worth(self):
         "*** YOUR CODE HERE ***"
+        age = Mint.current_year - self.year
+        if age > 50:
+            return self.cents + age - 50
+        else:
+            return self.cents
+
 
 class Nickel(Coin):
     cents = 5
+
 
 class Dime(Coin):
     cents = 10
@@ -108,7 +157,20 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+    def num_dights(n):
+        if n // 10 == 0:
+            return 1
+        else:
+            return num_dights(n // 10) + 1
 
+    num = num_dights(n)
+
+    if n // 10 == 0:
+        return n
+    else:
+        first = n // (10 ** (num - 1))
+        remainder = n % (10 ** (num - 1))
+        return Link(store_digits(first), store_digits(remainder))
 
 def is_bst(t):
     """Returns True if the Tree t has the structure of a valid BST.
@@ -190,7 +252,6 @@ def path_yielder(t, value):
 
     for _______________ in _________________:
         for _______________ in _________________:
-
             "*** YOUR CODE HERE ***"
 
 
@@ -246,6 +307,7 @@ class Tree:
     >>> t.branches[1].is_leaf()
     True
     """
+
     def __init__(self, label, branches=[]):
         for b in branches:
             assert isinstance(b, Tree)
@@ -308,5 +370,5 @@ class Tree:
             for b in t.branches:
                 tree_str += print_tree(b, indent + 1)
             return tree_str
-        return print_tree(self).rstrip()
 
+        return print_tree(self).rstrip()
