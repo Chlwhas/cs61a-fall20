@@ -119,7 +119,6 @@ class Mint:
         self.year = Mint.current_year
 
 
-
 class Coin:
     def __init__(self, year):
         self.year = year
@@ -157,6 +156,7 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+
     def num_digits(n):
         if n // 10 == 0:
             return 1
@@ -171,6 +171,7 @@ def store_digits(n):
         first = n // (10 ** (num - 1))
         remainder = n % (10 ** (num - 1))
         return Link(first, store_digits(remainder))
+
 
 def is_bst(t):
     """Returns True if the Tree t has the structure of a valid BST.
@@ -198,6 +199,7 @@ def is_bst(t):
     False
     """
     "*** YOUR CODE HERE ***"
+
     def bst_min(t):
         if t.is_leaf():
             return t.label
@@ -227,8 +229,6 @@ def is_bst(t):
             return all([is_bst(branch) for branch in t.branches])
 
 
-
-
 def preorder(t):
     """Return a list of the entries in this tree in the order that they
     would be visited by a preorder traversal (see problem description).
@@ -240,6 +240,14 @@ def preorder(t):
     [2, 4, 6]
     """
     "*** YOUR CODE HERE ***"
+    if t.is_leaf():
+        return [t.label]
+    else:
+        result = [t.label]
+        for branch in t.branches:
+            result.extend(preorder(branch))
+        return result
+
 
 
 def path_yielder(t, value):
@@ -278,10 +286,15 @@ def path_yielder(t, value):
     """
 
     "*** YOUR CODE HERE ***"
+    if t.label == value:
+        yield [t.label]
 
-    for _______________ in _________________:
-        for _______________ in _________________:
-            "*** YOUR CODE HERE ***"
+    if not t.is_leaf():
+        for branch in t.branches:
+            if not branch.is_leaf() or branch.label == value:
+                for elem in path_yielder(branch, value):
+                    "*** YOUR CODE HERE ***"
+                    yield [t.label] + elem
 
 
 class Link:
