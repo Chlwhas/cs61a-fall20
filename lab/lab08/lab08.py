@@ -8,6 +8,19 @@ def convert_link(link):
     []
     """
     "*** YOUR CODE HERE ***"
+    # # recursive solution
+    # if link is Link.empty:
+    #     return []
+    # else:
+    #     return [link.first] + convert_link(link.rest)
+
+    # iterative solution
+    result = []
+    while link is not Link.empty:
+        result.append(link.first)
+        link = link.rest
+    return result
+
 
 
 def every_other(s):
@@ -28,6 +41,14 @@ def every_other(s):
     Link(4)
     """
     "*** YOUR CODE HERE ***"
+    k = s
+    while k is not Link.empty and k.rest is not Link.empty:
+        k.rest = k.rest.rest
+        k = k.rest
+
+
+
+
 
 
 def cumulative_mul(t):
