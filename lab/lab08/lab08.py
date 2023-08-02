@@ -61,6 +61,14 @@ def cumulative_mul(t):
     Tree(105, [Tree(15, [Tree(5)]), Tree(7)])
     """
     "*** YOUR CODE HERE ***"
+    if not t.is_leaf():
+        for branch in t.branches:
+            if not branch.is_leaf():
+                cumulative_mul(branch)
+            t.label *= branch.label
+
+
+
 
 
 def has_cycle(link):
@@ -78,6 +86,18 @@ def has_cycle(link):
     False
     """
     "*** YOUR CODE HERE ***"
+    k = link
+    link_items = []
+    while k is not Link.empty:
+        for elem in link_items:
+            if elem is k:
+                return True
+
+        link_items.append(k)
+        k = k.rest
+
+    return False
+
 
 def has_cycle_constant(link):
     """Return whether link contains a cycle.
@@ -91,6 +111,7 @@ def has_cycle_constant(link):
     False
     """
     "*** YOUR CODE HERE ***"
+
 
 
 def reverse_other(t):
