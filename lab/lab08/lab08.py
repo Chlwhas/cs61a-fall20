@@ -111,6 +111,18 @@ def has_cycle_constant(link):
     False
     """
     "*** YOUR CODE HERE ***"
+    fast = link
+    slow = link
+    k = 0
+    while fast is not Link.empty:
+        fast = fast.rest
+        if fast is slow:
+            return True
+        if k % 2 == 1:
+            slow = slow.rest
+        k += 1
+    return False
+
 
 
 
@@ -128,6 +140,19 @@ def reverse_other(t):
     Tree(1, [Tree(8, [Tree(3, [Tree(5), Tree(4)]), Tree(6, [Tree(7)])]), Tree(2)])
     """
     "*** YOUR CODE HERE ***"
+    swap = []
+    for branch in t.branches:
+        swap.append(branch.label)
+
+    swap.reverse()
+
+    for index in range(len(swap)):
+        t.branches[index].label = swap[index]
+
+    for branch in t.branches:
+        for sub_branch in branch.branches:
+            reverse_other(sub_branch)
+
 
 
 class Link:
