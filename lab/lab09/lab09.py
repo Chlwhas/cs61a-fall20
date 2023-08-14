@@ -275,9 +275,10 @@ def trade(first, second):
     """
     m, n = 1, 1
 
-    equal_prefix = lambda: ______________________
-    while _______________________________:
-        if __________________:
+    equal_prefix = lambda : sum(first[:m]) == sum(second[:n])
+
+    while not equal_prefix() and m < len(first) and n < len(second):
+        if sum(first[:m]) < sum(second[:n]):
             m += 1
         else:
             n += 1
