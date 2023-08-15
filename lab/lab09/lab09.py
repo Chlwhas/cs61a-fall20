@@ -316,11 +316,11 @@ def shuffle(cards):
     ['A♡', 'A♢', 'A♤', 'A♧', '2♡', '2♢', '2♤', '2♧', '3♡', '3♢', '3♤', '3♧']
     """
     assert len(cards) % 2 == 0, 'len(cards) must be even'
-    half = _______________
+    half = len(cards) // 2
     shuffled = []
-    for i in _____________:
-        _________________
-        _________________
+    for i in range(half):
+        shuffled.append(cards[i])
+        shuffled.append(cards[i + half])
     return shuffled
 
 
@@ -339,14 +339,14 @@ def insert(link, value, index):
     >>> insert(link, 4, 5)
     IndexError
     """
-    if ____________________:
-        ____________________
-        ____________________
-        ____________________
-    elif ____________________:
-        ____________________
+    if link is not Link.empty and index == 0:
+        new_link = Link(link.first, link.rest)
+        link.rest = new_link
+        link.first = value
+    elif link is not Link.empty and index > 0:
+        insert(link.rest, value, index - 1)
     else:
-        ____________________
+        raise IndexError
 
 
 def deep_len(lnk):
