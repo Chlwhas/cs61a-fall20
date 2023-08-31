@@ -41,21 +41,19 @@
 
 
 (define (no-repeats lst)
-    (define (inner x s)
-        (cond
-            (
-                (null? x) s        
-            )
-            (
-                (not (in (car x) s)) 
-                (inner (cdr x) (cons (car x) s))
-            )
-            (
-                else (inner (cdr x) s)
+    (define (helper lst seen)
+        (if (null? lst)
+            '()
+            (let ((first (car lst))
+                  (rest (cdr lst)))
+              (if (in first seen)
+                  (helper rest seen)
+                  (cons first (helper rest (cons first seen)))
+                )
             )
         )
     )
-
+          
     (define (in x lst) 
         (cond
             ((null? lst) #f)
@@ -64,19 +62,8 @@
             )
     )
 
-    (define (reverse lst)
-        (define (inner l rl)
-            (if (null? l)
-                rl
-                (inner (cdr l) (cons (car l) rl))
-                )
-            )
-        (inner lst '())
-    )
-
-    (reverse (inner lst '()))
-
-    
+  (helper lst '())
+  
 )
 
 
